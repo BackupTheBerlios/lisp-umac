@@ -3,7 +3,7 @@
 ;;Accumulation-like
 (def-umac :list (&optional (list-into 'ret) initial)
   "Listing stuff; collecting, appending"
-  `((:let (,list-into ,initial) ,last)
+  `((:let (,list-into ,initial))
     (:flet (collecting (&rest collected)
 	     (setf- append ,list-into collected))
            (appending (&rest appended)
