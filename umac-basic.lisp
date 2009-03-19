@@ -1,14 +1,21 @@
 (in-package #:umac)
 
 ;;Accumulation-like
-(def-umac :list (&optional (list-into 'ret) initial)
-  "Listing stuff; collecting, appending"
-  `((:let (,list-into ,initial))
+(def-umac :list (&optional (into-list 'ret) initial)
+  "Listing stuff; collecting, appending. After this, you may only\
+ manipulate the list with these functions!w"
+  (let ((last (gensym)))
+  `((:let (,into-list ,initial) ,last)
     (:flet (collecting (&rest collected)
-	     (setf- append ,list-into collected))
-           (appending (&rest appended)
-	     (dolist (a appended)
-	       (setf- append ,list-into a))))))
+	     (if (null ,into-list)
+	       (setf ,into-list collected  ,last (last ,into-list))
+	       (setf (cdr ,last) collected ,last (last ,last))))
+	   (appending (&rest appended)
+	     (dolist (list appended)
+	       (dolist (el list)
+		 (collecting el))))
+	   (fix-list ()
+	     (setf ,last (last ,last)))))))
 
 (def-umac :sum (&optional (sum-onto 'ret) (initial 0))
   "Summing onto a variable; summing"

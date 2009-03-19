@@ -26,6 +26,13 @@
 (defmacro setf- (change set &rest args)
   `(setf ,set (,change ,set ,@args)))
 
+(defmacro flet* ((&rest funs) &body body)
+  `(flet (,(car funs))
+     ,@(if (null(cdr funs))
+	 body
+	 `((flet* (,@(cdr funs))
+	     ,@body)))))
+
 (defmacro umac ((&rest rest) &body body)
   "Umac allows you to make variables and functions/macros manipulating them
 in one sentence."
@@ -52,9 +59,9 @@ in one sentence."
 	       (if got-fun
 		 (setf iter (append (funcall got-fun el) (cdr iter)))
 		 (error "You tried to use a non-existent extension."))))))))
-    `(let (,@got-let) ;Put it all together. Here be roles of above variables.
+    `(let*(,@got-let) ;Put it all together. Here be roles of above variables.
      (symbol-macrolet (,@got-smlet)
-     (flet ((values-default ()
+     (flet*((values-default ()
 	      ,(flet ((get-var (name)
 			(when (first-match got-let name
 				(lambda (el eql-to) (eql (delist el) eql-to)))
