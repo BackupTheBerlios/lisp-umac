@@ -1,3 +1,4 @@
+;;This file is in public domain.
 
 (load "umac.lisp")
 (load "umac-basic.lisp")

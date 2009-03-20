@@ -1,3 +1,5 @@
+;This file is in public domain.
+
 (in-package #:umac)
 
 ;;NOTE some stuff is build in:

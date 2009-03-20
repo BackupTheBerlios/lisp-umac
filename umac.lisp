@@ -1,3 +1,5 @@
+;This file is in public domain.
+
 (defpackage #:umac
   (:use #:common-lisp)
   (:export umac def-umac
