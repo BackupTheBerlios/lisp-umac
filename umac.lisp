@@ -36,7 +36,8 @@
 (defmacro umac ((&rest rest) &body body)
   "Umac allows you to make variables and functions/macros manipulating them
 in one sentence."
-  (let (got-let got-smlet got-flet got-mlet got-post force-return)
+  (let (got-let got-smlet got-flet got-mlet
+	got-post force-return got-initially got-finally)
     (do ((iter rest iter)) ((null iter) nil)
       (let ((el (car iter)))
 	(flet ((got-more (list) ;Add stuff and iterate forward.
@@ -54,6 +55,8 @@ in one sentence."
 	    (:force-return ;Coerces what is returned.
 	     (setf force-return (cadr el))
 	     (setf- cdr iter))
+	    (:initially (setf- got-more got-initially))
+	    (:finally (setf- got-more got-finally))
 	    (t ;A umac from extension. Uses iterator as a 'stack' here.
 	     (let ((got-fun (gethash (car el) *umac-hash*)))
 	       (if got-fun
@@ -72,9 +75,11 @@ in one sentence."
             ,@got-flet)
      (macrolet ((values-d () '(values-default))
 		,@got-mlet)
+       ,@got-initially
        (do () (nil nil)
 	 ,@body
 	 ,@got-post)
+       ,@got-finally
        ,(if force-return force-return '(values-default))))))))
 
 (defmacro def-umac (name (&rest arguments) &body body)

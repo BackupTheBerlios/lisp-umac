@@ -19,6 +19,6 @@
 ;This one should fail; extension miauw doesn't exist.
 ; (Unless you defined it.)
 (umac ((:miauw el (list 1 2 3 4 5 6 7 8)))
-  (collecting (+ el 10)))
+  (collecting (+ el 10))) ;See comment.
 
 

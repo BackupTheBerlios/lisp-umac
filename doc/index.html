@@ -1,0 +1,58 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+   <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+
+<title>umac (minor)project page</title> </head><body>
+
+<h2>Umac</h2>
+This is a little thing i made in order to loop, accumulate and reduce easily. One guideline 
+for it's development is that it never scans regular code, instead relying on a form to put 
+things in that do the 'special' stuff.
+It would seem likely that <a href="http://common-lisp.net/project/iterate/">iterate</a> is 
+superior to it.(Although i am no expert on iterate) It does, however have advantages over LOOP:
+
+<ul><li>It can work inside functions, so it can be used in callbacks.</li>
+    <li>On the inside, it is simpler. (Also advantage vs iterate.)</li>
+    <li>It's body is just a regular body, it doesn't have to reinvent IF, WHEN, COND, 
+etcetera.</li>
+    <li>It is extensible.</li>
+</ul>
+
+It also has disadvantages:
+<ul><li>Special stuff has to be in the form.</li>
+    <li>Since it doesn't look into body/macroexpansion it can't see what in it's flet, let,
+      etcetera is actually necessary. A lot of useless fluff in the macroexpansion result.
+    (It isn't pretty, but it shouldn't affect performance.</li>
+    <li>No <a href="http://common-lisp.net/project/iterate/doc/Named-Blocks.html#Named-Blocks">
+	named blocks</a> that iterate has.(yet)</li>
+</ul>
+
+I made a <a href="http://www.lispforum.com/viewtopic.php?f=2&t=295">discussion thread</a> about it.
+
+<h3>Getting it</h3>
+You can get it <a href="https://developer.berlios.de/git/?group_id=10729">via git</a>, or via 
+<a href="http://download.berlios.de/gitdumps/lisp-umac-git.tar.gz">daily git tarballs</a>.
+
+<h3>Development</h3>
+No guarantees i will develop umac any further. You can ask me for access/ ask me to add changes to 
+source/added extensions, if you are so inclined. (Always try to do things with extensions first.)
+
+<h3>Other projects of mine</h3>
+My more important project currently (as of May 20'th 2009) is
+<a href="http://lang-lisp.berlios.de/main.html">lang-lisp</a>.
+
+<h3>Contact</h3>
+For direct contact, ojasper is the nickname for Berlios account, put dot after the 'o'
+in the nick and append @gmail.com.
+
+<hr />
+<table><tr><td width="80%"></td>
+    <td><big>Hosted by</big></td>
+    <td>
+      <a href="http://developer.berlios.de">
+	<img src="http://developer.berlios.de/bslogo.php?group_id=10613" width="124" height="32" border="0" alt="BerliOS Logo" /></a> 
+    </td>
+
+</tr></table>
+
+</html>

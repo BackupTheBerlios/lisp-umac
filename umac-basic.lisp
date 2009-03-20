@@ -1,5 +1,9 @@
 (in-package #:umac)
 
+;;NOTE some stuff is build in:
+; :let, :flet, :mlet(macrolet), :smlet (symbol-macrolet),
+; :initially, :finally, :force-return.
+
 ;;Accumulation-like
 (def-umac :list (&optional (into-list 'ret) initial)
   "Listing stuff; collecting, appending. After this, you may only\
@@ -32,7 +36,10 @@
 ;;End condition
 (def-umac :return ()
   "Returning; until, while. WARNING uses (return), will behave such!"
-  `((:mlet (force-return (returned)
+  `((:mlet (return-val (returned)
+	     `(progn (setf ret ,returned)
+		     (return)))
+	   (set-returned (returned)
 	     `(setf ret ,returned))
            (until (&rest and)
 	     `(when (and ,@and) (return)))
@@ -40,7 +47,8 @@
 	     `(unless (and ,@and) (return))))))
 
 (def-umac :once ()
-  "Return after single run of umac.(Overrides others that say loop.)"
+  "Return after single run of umac.(Overrides any others that say loop.)
+Useful for function callbacks."
   `((:post (return))))
 
 ;;Iteration.
@@ -67,4 +75,3 @@ list runs out."
     `((:let (,arr ,array))
       (:repeat ,(length arr) ,i)
       (:smlet (,var (aref ,arr ,i))))))
-
