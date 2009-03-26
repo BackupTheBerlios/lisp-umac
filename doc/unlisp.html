@@ -2,7 +2,7 @@
 <html><head>
    <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 
-<title>Main page</title> </head><body>
+<title>unlisp; not-so-lispy notation</title> </head><body>
 <table><tr height=10%>
 
 <table>
@@ -42,8 +42,20 @@
 </table>
 </td><td width=80%>
 
-This page was originally for the <a href="umac.html">umac</a> macro. Now i have
- also added some other (reader)macros, like <a href="scope">scope</a> and <a href="unlisp.html">unlisp</a>.
+<h2>Unlisp</h2>
+
+Unlisp has:
+
+<ul>
+  <li>A reader macro and macro for writing functions with binary function notation. [a+b*2] and such. 
+    Supports order of operation.</li>
+  <li>fancy-scope macro that adds = (setting), := (defining), working via <a href="scope.html">scope</a>.
+  <li>A reader macro that makes things between curly brackets {} point to a macro. Activate with
+(unlisp:fancy :curly-hooks to-macro) if (eql to-macro t) it points to fancy-scope</li>
+</ul>
+
+<h3>Autodoc</h3>
+<a href="unlisp-autodoc.html">Here.</a>
 
 <hr />
 <table><tr><td width="80%"></td>

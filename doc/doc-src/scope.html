@@ -1,0 +1,25 @@
+
+<h2>Scope</h2>
+<p>Scope is a single macro that allows you to define variables/functions within a 
+scope rather then valid in a body. Instead of:</p>
+
+<code>
+  (flet ((fun1 (arg1)...) (fun2 (arg2)...)) <br />
+    (let ((var1 (fun1 x))) <br />
+      (flet ((fun-depending-on-that (blabla) ..)) <br />
+        ..body..)))
+</code>
+<p>You can write:</p>
+<code>(scope <br />
+        (funs (fun1 (arg1) ...) <br />
+              (fun2 (arg2) ...)) <br />
+        (var var1 (fun1 x)) <br />
+        (fun fun-depending-on-that (blabla) ..) <br />
+        ..body..)
+</code>
+<p>However, i found out that having to write more can often lead you to think of 
+better ways to do things, so i am not using it.</p>
+
+<h3>Autodoc</h3>
+<a href="scope-autodoc.html">Here.</a>
+

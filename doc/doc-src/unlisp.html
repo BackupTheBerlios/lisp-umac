@@ -1,0 +1,15 @@
+
+<h2>Unlisp</h2>
+
+Unlisp has:
+
+<ul>
+  <li>A reader macro and macro for writing functions with binary function notation. [a+b*2] and such. 
+    Supports order of operation.</li>
+  <li>fancy-scope macro that adds = (setting), := (defining), working via <a href="scope.html">scope</a>.
+  <li>A reader macro that makes things between curly brackets {} point to a macro. Activate with
+(unlisp:fancy :curly-hooks to-macro) if (eql to-macro t) it points to fancy-scope</li>
+</ul>
+
+<h3>Autodoc</h3>
+<a href="unlisp-autodoc.html">Here.</a>

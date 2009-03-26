@@ -1,0 +1,92 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+   <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+
+<title>umac</title> </head><body>
+<table><tr height=10%>
+
+<table>
+    <td width="20%"></td>
+    <td width="20%"><big><h1>Lang-lisp project page</h1></big></td>
+</table>
+</tr><tr height=90%><table><td width=20% valign="top">
+
+<big>
+  <h3>Contents</h3>
+  <ul>
+    <li><a href="main.html">Main page</a></li>
+    <li><a href="umac.html">umac</a><br />
+        <a href="umac-autodoc.html">autodoc</a> </li>
+    <li><a href="scope.html">scope</a><br />
+        <a href="scope-autodoc.html">autodoc</a> </li>
+    <li><a href="unlisp.html">unlisp</a><br />
+        <a href="unlisp-autodoc.html">autodoc</a> </li>
+    <li><b>Download</b>
+      <ul><li><a href="https://developer.berlios.de/git/?group_id=10729" >Git repository</a></li>
+        <li><a href="http://download.berlios.de/gitdumps/lisp-umac-git.tar.gz" >Daily tarball</a></li>
+	<li><a href="https://git.berlios.de/cgi-bin/gitweb.cgi?p=lisp-umac;a=summary" >Git activity; commits</a></li>
+      </ul>
+    </li>
+    <li><a href="about.html">About/Contact</a></li>
+  </ul>
+</big>
+<small>Last update March 1 2009</small>
+
+<hr />
+<table>
+  <td><big>Hosted by</big></td>
+  <td>
+    <a href="http://developer.berlios.de">
+      <img src="http://developer.berlios.de/bslogo.php?group_id=10613" width="124" height="32" border="0" alt="BerliOS Logo" /></a> 
+      </td>
+</table>
+</td><td width=80%>
+<h2>Umac</h2>
+This is a little thing i made in order to loop, accumulate and reduce easily. One guideline 
+for it's development is that it never scans regular code, instead relying on a form to put 
+things in that do the 'special' stuff.
+It would seem likely that <a href="http://common-lisp.net/project/iterate/">iterate</a> is 
+superior to it.(Although i am no expert on iterate) It does, however have advantages over LOOP:
+
+<ul><li>It can work inside functions, so it can be used in callbacks.</li>
+    <li>On the inside, it is simpler, only 178 lines.(Including basic extensions.)
+ (Also advantage vs iterate.)</li>
+    <li>It's body is just a regular body, it doesn't have to reinvent IF, WHEN, COND, 
+etcetera.</li>
+    <li>It is extensible.</li>
+</ul>
+
+It also has disadvantages:
+<ul><li>Special stuff has to be in the form.</li>
+    <li>Since it doesn't look into body/macroexpansion it can't see what in it's flet, let,
+      etcetera is actually necessary. A lot of useless fluff in the macroexpansion result.
+    (It isn't pretty, but it shouldn't affect performance.</li>
+    <li>No <a href="http://common-lisp.net/project/iterate/doc/Named-Blocks.html#Named-Blocks">
+	named blocks</a> that iterate has.(yet)</li>
+</ul>
+
+I made a <a href="http://www.lispforum.com/viewtopic.php?f=2&t=295">discussion thread</a> about it.
+
+<h3>Getting it</h3>
+You can get it <a href="https://developer.berlios.de/git/?group_id=10729">via git</a>, or via 
+<a href="http://download.berlios.de/gitdumps/lisp-umac-git.tar.gz">daily git tarballs</a>.
+There is no documentation. Read the code and documentation strings. Also, it rather untested, but
+i think it will probably all work.
+
+<h3>Development</h3>
+I don't expect to develop umac any further. You can ask me for access/ ask me to add changes to 
+source/added extensions, if you are so inclined. (Always try to do things with extensions first.)
+
+<h3>Auto-documentation</h3>
+<a href="unlisp-autodoc.html">Here</a>
+
+<hr />
+<table><tr><td width="80%"></td>
+    <td><big>Hosted by</big></td>
+    <td>
+      <a href="http://developer.berlios.de">
+	<img src="http://developer.berlios.de/bslogo.php?group_id=10613" width="124" height="32" border="0" alt="BerliOS Logo" /></a> 
+    </td>
+</tr></table>
+
+</td></table></tr></table></body></html>

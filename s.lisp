@@ -1,25 +1,59 @@
-;;This file is in public domain.
+(load "scope.lisp")
 
+(load "unlisp.lisp")
 (load "umac.lisp")
-(load "umac-basic.lisp")
 
-(in-package #:umac)
+(require :asdf)
 
-(umac ((:return) (:list) (:sum val-0))
-  (until (> val-0 10))
-  (summing 1)
-  (fix-list)
-  (collecting val-0 'q) (appending '(a b)))
-(umac ((:for i 0 (+ i 1)) (:return) (:list))
-  (collecting i)
-  (until (> i 10)))
+(require :asdf-install)
 
-(umac ((:list) (:for-list el (list 1 2 3 4 5 6 7 8)))
-  (collecting (+ el 10)))
+(documentation-template:create-template
+  '#:umac :target "doc/doc-src/autodoc/umac.html"
+	  :subtitle "Inferior to iterate")
+(documentation-template:create-template
+  '#:scope :target "doc/doc-src/autodoc/scope.html"
+	   :subtitle "Scoped variables, functions and (symbol)macros.")
+(documentation-template:create-template
+  '#:unlisp :target "doc/doc-src/autodoc/unlisp.html"
+  :subtitle "Not so lispy constructs.")
 
-;This one should fail; extension miauw doesn't exist.
-; (Unless you defined it.)
-(umac ((:miauw el (list 1 2 3 4 5 6 7 8)))
-  (collecting (+ el 10))) ;See comment.
+(in-package #:unlisp)
 
+(disable-fancy :sep-mac-char)
 
+(set-macro-character #\: nil)
+
+(progn
+  (defvar *keyword* :keyword "Without this, keywords are gone forever.\
+ (Unless you restart.)")
+  (set-macro-character
+   #\: (lambda (stream char)
+	 "I could make separators and stoppers if the damn characters \
+weren't taken. This one not a good one for it either, even with hack."
+	 (let ((rch (read-char stream))) ;Peek if it is a keyword.
+	   (case rch
+	     ((#\Space #\Tab #\Newline #\) #\;) ;It's not, make sep.
+	      (unread-char rch stream)
+	      'sep)
+	     (t
+	      (do*((ch rch (read-char stream)) ;It's a keyword, collect it.
+		   (str "" str))
+		  ((case ch
+		     ((#\Space #\Newline #\Tab #\; 
+		       #\' #\` #\, #\))
+		      t)
+		     (t
+		      (setf str (concatenate 'string str (list ch)))
+		      nil))
+		   (intern (string-upcase str) *keyword*)))))))))
+
+(progn
+  (defvar *old-semicolum* (get-macro-character #\;)
+    "Holds the semicolon readmacro, when read at this point.")
+  ;Even worse then #\:..
+  (set-macro-character
+   #\; (if how (lambda (stream char)
+		 (case (peek-char nil stream)
+		   (#\Newline 'sep)
+		   (t  	      (funcall *old-semicolum* stream char))))
+	   *old-semicolum*)))
