@@ -21,6 +21,8 @@
         <a href="scope-autodoc.html">autodoc</a> </li>
     <li><a href="unlisp.html">unlisp</a><br />
         <a href="unlisp-autodoc.html">autodoc</a> </li>
+    <li><a href="vect.html">vect</a><br />
+        <a href="vect-autodoc.html">autodoc</a> </li>
     <li><b>Download</b>
       <ul><li><a href="https://developer.berlios.de/git/?group_id=10729" >Git repository</a></li>
         <li><a href="http://download.berlios.de/gitdumps/lisp-umac-git.tar.gz" >Daily tarball</a></li>
@@ -30,7 +32,7 @@
     <li><a href="about.html">About/Contact</a></li>
   </ul>
 </big>
-<small>Last update March 1 2009</small>
+<small>Last update March 26 2009</small>
 
 <hr />
 <table>
@@ -43,8 +45,8 @@
 </td><td width=80%>
 
 <h2>Scope</h2>
-<p>Scope is a single macro that allows you to define variables/functions within a 
-scope rather then valid in a body. Instead of:</p>
+<p>Scope is a single macro that allows you to define variables/functions 
+within a scope rather then valid in a body. Instead of:</p>
 
 <code>
   (flet ((fun1 (arg1)...) (fun2 (arg2)...)) <br />
@@ -60,8 +62,8 @@ scope rather then valid in a body. Instead of:</p>
         (fun fun-depending-on-that (blabla) ..) <br />
         ..body..)
 </code>
-<p>However, i found out that having to write more can often lead you to think of 
-better ways to do things, so i am not using it.</p>
+<p>However, i found out that having to write more can often lead you to
+ think of better ways to do things, so i am not using it.</p>
 
 <h3>Autodoc</h3>
 <a href="scope-autodoc.html">Here.</a>
