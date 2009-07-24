@@ -1,12 +1,15 @@
-;This file is in public domain.
+;;Author: Jasper den Ouden
+;;This file is in public domain.
 
-(defpackage #:umac
-  (:use #:common-lisp)
+(defpackage :umac
+  (:use :common-lisp)
   (:export umac def-umac
 	   values-default values-d
-	   collecting appending summing until while force-return))
+	   ret val-1 val-2 val-3 val-4 val-5 val-6 val-7
+	   collecting appending summing summing-into until while force-return)
+  (:documentation "Extendable looping, collecting and declaration macro."))
 
-(in-package #:umac)
+(in-package :umac)
 
 (defvar *umac-hash* (make-hash-table))
 
@@ -39,7 +42,7 @@
   "Umac allows you to make variables and functions/macros manipulating them
 in one sentence."
   (let (got-let got-smlet got-flet got-mlet
-	got-post force-return got-initially got-finally)
+	got-post force-return got-initially got-finally (block-name (gensym)))
     (do ((iter rest iter)) ((null iter) nil)
       (let ((el (car iter)))
 	(flet ((got-more (list) ;Add stuff and iterate forward.
@@ -59,19 +62,21 @@ in one sentence."
 	     (setf- cdr iter))
 	    (:initially (setf- got-more got-initially))
 	    (:finally (setf- got-more got-finally))
+	    (:block (setf- got-more block-name))
 	    (t ;A umac from extension. Uses iterator as a 'stack' here.
 	     (let ((got-fun (gethash (car el) *umac-hash*)))
 	       (if got-fun
 		 (setf iter (append (funcall got-fun el) (cdr iter)))
 		 (error "You tried to use a non-existent extension."))))))))
-    `(let*(,@got-let) ;Put it all together. Here be roles of above variables.
+    `(block ,block-name
+     (let*(,@got-let) ;Put it all together. Here be roles of above variables.
      (symbol-macrolet (,@got-smlet)
      (flet*((values-default ()
 	      ,(flet ((get-var (name)
 			(when (first-match got-let name
 				(lambda (el eql-to) (eql (delist el) eql-to)))
 			  name)))
-		 `(values ,(get-var 'ret)   ,(get-var 'val-0) ,(get-var 'val-1)
+		 `(values ,(get-var 'ret)   ,(get-var 'val-1)
 			  ,(get-var 'val-2) ,(get-var 'val-3) ,(get-var 'val-4)
 			  ,(get-var 'val-5) ,(get-var 'val-6) ,(get-var 'val-7))))
             ,@got-flet)
@@ -82,7 +87,7 @@ in one sentence."
 	 ,@body
 	 ,@got-post)
        ,@got-finally
-       ,(if force-return force-return '(values-default))))))))
+       ,(if force-return force-return '(values-default)))))))))
 
 (defmacro def-umac (name (&rest arguments) &body body)
   "Defines a umac for you."

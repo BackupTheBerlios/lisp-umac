@@ -7,7 +7,7 @@
 
 <table>
     <td width="20%"></td>
-    <td width="20%"><big><h1>Lang-lisp project page</h1></big></td>
+    <td width="20%"><big><h1>Some small lisp things</h1></big></td>
 </table>
 </tr><tr height=90%><table><td width=20% valign="top">
 
@@ -21,8 +21,7 @@
         <a href="scope-autodoc.html">autodoc</a> </li>
     <li><a href="unlisp.html">unlisp</a><br />
         <a href="unlisp-autodoc.html">autodoc</a> </li>
-    <li><a href="vect.html">vect</a><br />
-        <a href="vect-autodoc.html">autodoc</a> </li>
+    <li><a href="generic.html">generic</a></li>
     <li><b>Download</b>
       <ul><li><a href="https://developer.berlios.de/git/?group_id=10729" >Git repository</a></li>
         <li><a href="http://download.berlios.de/gitdumps/lisp-umac-git.tar.gz" >Daily tarball</a></li>
@@ -62,9 +61,8 @@ It also has disadvantages:
 <ul><li>Special stuff has to be in the form.</li>
     <li>Since it doesn't look into body/macroexpansion it can't see what in it's flet, let,
       etcetera is actually necessary. A lot of useless fluff in the macroexpansion result.
-    (It isn't pretty, but it shouldn't affect performance.</li>
-    <li>No <a href="http://common-lisp.net/project/iterate/doc/Named-Blocks.html#Named-Blocks">
-	named blocks</a> that iterate has.(yet)</li>
+    (It isn't pretty looking at the macroexpansion, but it shouldn't affect performance. Also, easily fixable.)</li>
+    <li>Not nearly as tried and tested.</li>
 </ul>
 
 I made a <a href="http://www.lispforum.com/viewtopic.php?f=2&t=295">discussion thread</a> about it.
@@ -80,7 +78,7 @@ I don't expect to develop umac any further. You can ask me for access/ ask me to
 source/added extensions, if you are so inclined. (Always try to do things with extensions first.)
 
 <h3>Auto-documentation</h3>
-<a href="umac-autodoc.html">Here</a>
+<a href="unlisp-autodoc.html">Here</a>
 
 <hr />
 <table><tr><td width="80%"></td>

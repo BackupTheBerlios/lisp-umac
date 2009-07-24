@@ -1,3 +1,6 @@
+;;Author: Jasper den Ouden
+;;This file is in public domain.
+
 (load "scope.lisp")
 
 (load "unlisp.lisp")

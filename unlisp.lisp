@@ -1,8 +1,10 @@
+;;Author: Jasper den Ouden
+;;This file is in public domain.
 
 (defpackage #:unlisp
   (:use #:common-lisp #:scope)
   (:export fancy scope-fancy binary)
-  (:documentation "Assortment of fancy notation."))
+  (:documentation "Assortment of fancy notation.(A lot of which doesn't make much sense."))
 
 (in-package #:unlisp)
 

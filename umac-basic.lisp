@@ -1,4 +1,5 @@
-;This file is in public domain.
+;;Author: Jasper den Ouden
+;;This file is in public domain.
 
 (in-package #:umac)
 
@@ -29,11 +30,17 @@
     (:mlet (summing (&rest added)
 	     `(setf- + ,',sum-onto ,@added)))))
 
-(def-umac :ops (&optional (onto 'ret) initial)
+(def-umac :sum-into (&optional (sum-onto 'val-1) (initial 0))
+  "Summing onto a variable; summing"
+  `((:let  (,sum-onto ,initial))
+    (:mlet (summing-into (into &rest added)
+	     `(setf- + ,into ,@added)))))
+
+(def-umac :op (&optional (by-name 'op) op (onto 'ret) initial)
   "Changing stuff with any operation."
   `((:let (,onto ,initial))
-    (:mlet (op (op-name &rest args)
-	     `(setf- ,op-name ,,onto ,@args)))))
+    (:mlet (,by-name (op-name &rest args)
+	     `(setf- ,,op ,,onto ,@args)))))
 
 ;;End condition
 (def-umac :return ()
@@ -55,12 +62,15 @@ Useful for function callbacks."
 
 ;;Iteration.
 (def-umac :for (iter start change)
+  "DO-like iteration."
   `((:let (,iter ,start)) (:post (setf ,iter ,change))))
 
 (def-umac :for-interval (i from to)
-  `((:for ,i ,from (+ ,i 1)) (:post (unless (< i ,to) (return)))))
+  "Does something for intager inside an interval assumes from<=to."
+  `((:for ,i ,from (+ ,i 1)) (:post (unless (< ,i ,to) (return)))))
 
 (def-umac :repeat (count &optional (i (gensym)))
+  "Repeats some statement."
   `((:for-interval ,i 0 ,count)))
 
 (def-umac :for-list (var list &optional (end-cond :stop) (iter (gensym)))
@@ -73,7 +83,8 @@ list runs out."
 	(:stop `((:post (when (null ,iter) (return))))))))
 
 (def-umac :for-vect (var array &optional (i (gensym)))
+  "Iterator over a vector."
   (let ((arr (gensym)))
     `((:let (,arr ,array))
-      (:repeat ,(length arr) ,i)
+      (:repeat (length ,arr) ,i)
       (:smlet (,var (aref ,arr ,i))))))

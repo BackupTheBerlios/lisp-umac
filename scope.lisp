@@ -1,3 +1,5 @@
+;;Author: Jasper den Ouden
+;;This file is in public domain.
 
 (defpackage #:scope
   (:use #:common-lisp)
