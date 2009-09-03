@@ -1,7 +1,7 @@
 ;;Author: Jasper den Ouden
 ;;This file is in public domain.
 
-(require :iterate)
+(cl:in-package)
 
 (defpackage #:generic
   (:nicknames #:gen)
@@ -12,7 +12,9 @@
 	   if-let if-use when-let case-let
 	   cond* ift when-do
 	   string-case
-	   clamp)
+	   clamp
+
+	   with-mod-slots)
   (:documentation "Assortment of little useful macros/functions."))
 
 (in-package #:generic)
@@ -137,3 +139,16 @@
   (cond ((< clamped from) from)
 	((> clamped to)   to)
 	(t                clamped)))
+
+(defmacro with-mod-slots (mod (&rest slots) object &body body)
+  "WITH-SLOTS, but requires something to be prepended to the\
+ SYMBOL-MACROLET's, this allows you to use two or more objects with\
+ convenient symbols at the same time."
+  (with-gensyms (obj)
+    `(let ((,obj ,object))
+       (symbol-macrolet
+	   (,@(iter
+	       (for slot in slots)
+	       (collect `(,(intern (format nil "~D~D" mod slot))
+			   (slot-value ,obj ',slot)))))
+	 ,@body))))

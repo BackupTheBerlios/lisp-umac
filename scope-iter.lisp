@@ -1,3 +1,7 @@
+;;Author Jasper den
+
+(cl:in-package :cl)
+
 (require :iterate)
 
 (defpackage #:scope
