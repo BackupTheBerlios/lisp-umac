@@ -1,5 +1,5 @@
 ;;
-;; Copyright (c) 2007-2009, Jasper den Ouden <o.jasper@gmail.com>
+;; Copyright (c) 2009, Jasper den Ouden <o.jasper@gmail.com>
 ;;
 ;; Permission is hereby granted, free of charge, to any person obtaining a copy
 ;; of this software and associated documentation files (the "Software"), to deal
@@ -40,7 +40,10 @@
 A few macros are given, some are on keywords and specific to denest, to \
  save namespace.  They do _exactly_ the same as regular macros however! You\
  can use them with the USE-DENEST macro. The macros supplied in this packageIf
-with non-keyword symbols are exported."))
+with non-keyword symbols are exported.
+
+TODO remove some nastyness that might happen if denest is nested with self..
+Can it be done?"))
 
 (in-package :denest)
 
@@ -57,8 +60,9 @@ with non-keyword symbols are exported."))
   "Create a macro applied when denests meets an keyword.\
  :return is reserved."
   (unless (keywordp name)
-    (error "Denest-specific macros need to have keyword; if the namespace\
- isn't taken, you could just replace def-denest-macro with defmacro."))
+    (error "Denest-specific macros need to be set on keyword; if the\
+ namespace isn't taken, you could just replace def-denest-macro with\
+ defmacro."))
   (let ((form (gensym)))
     `(flet ((denest-keyword-macro (,form)
 	     (destructuring-bind (,@args) ,form
@@ -84,7 +88,13 @@ with non-keyword symbols are exported."))
 	 (denest-raw ,@(cdr args))))))
 
 (defmacro denest (&rest args)
-  "Un-nests stuff, reconstructs macros in order with the body at the end."
+  "Un-nests stuff, reconstructs macros in order with the body at the end.
+Best and easiest description is: (But the actual version has some more 
+ (defmacro denest (&rest args)
+   (if (null (cdr args))
+     (car args)
+     `(,@(car args)
+       (denest ,@(cdr args)))))"
   `(block denest
      (block denest-prev-ret
        (macrolet ((finish ()
@@ -100,8 +110,9 @@ Has significant disadvantage; can't do stuff where the body location isn't\
  DESTRUCTURING-BIND, MULTIPLE-VALUE-BIND."
   `(denest ,@(mapcar (lambda (a)
 		       (destructuring-bind (name &rest args) a
-			 (print args)
 			 `(,name (,@args)))) arguments)))
+
+;;--------------------------------------------------------------------------
 
 ;;Macros applicable to denesting. (But also by themselves.)
 
@@ -116,6 +127,7 @@ Multiple accumulations need to go by different names."
     (setf operation (list operation)))
   
   `(let (,@(unless without-let `((,onto ,initial))))
+     ,@(unless without-let `((declare (ignorable ,onto))))
      (macrolet ((,by-name (&rest args)
 		  (when (null args)
 		    (error "Accumulation use does nothing."))
@@ -130,13 +142,7 @@ Multiple accumulations need to go by different names."
   (unless initial (setf initial 0)) ;This way, for sake of return-accumulate
   `(accumulating (,initial ,onto + summing ,without-let) ,@body))
 
-(defmacro multiplying ((&optional initial (onto (gensym)) without-let)
-		   &body body)
-  "Multiply everything asked to, return result."
-  (unless initial (setf initial 1)) ;This way, for sake of return-accumulate
-  `(accumulating (,initial ,onto * multiplying ,without-let) ,@body))
-
-(defmacro collecting ((&optional (initial nil) (onto (gensym))
+(defmacro collecting ((&optional (initial '(list)) (onto (gensym))
 				 (collect 'collecting) (append 'appending)
 				 (last (gensym)) (append-1 (gensym)))
 		      &body body)
@@ -144,6 +150,7 @@ Multiple accumulations need to go by different names."
 If you want to use two different collectings, you need to provide the\
  collect argument.(To avoid namespace collision, and to separate the two.)"
   `(let ((,onto ,initial) ,last)
+     (declare (ignorable ,onto))
      (flet ((,append-1 (collected)
 	      (if (null ,onto)
 		  (progn (setf ,onto collected)
@@ -158,7 +165,6 @@ If you want to use two different collectings, you need to provide the\
 	 (denest-ret ,@body)))
      ,onto))
 
-;;TODO doesn't work .... Changer not called.. Why?
 (defmacro besting ((valuator &key intermediate initial (best (gensym))
 			     (by-name 'besting) (changer (gensym)))
 		   &body body)
@@ -200,7 +206,7 @@ Needs a block to return to, 'denest is always the top block."
 Must given accumulation-manners given in same way as denest ones, they must\
  have form (macro-name (something accumulating-variable ...) ...)"
   (denest
-    (collecting (nil vars col-var))
+    (collecting (nil vars col-var)) ;TODO Unreachable code?
     (collecting (nil accum col-accum))
     (:return `(denest ,@accum
 		(:return (values ,@vars))
@@ -210,6 +216,7 @@ Must given accumulation-manners given in same way as denest ones, they must\
 	((listp a)
 	 (destructuring-bind (name (&optional initial var &rest more)
 				   &rest rest) a
+	   (declare (ignore more))
 	   (cond
 	     (var (col-var var)
 		  (col-accum a))
@@ -231,17 +238,22 @@ Must given accumulation-manners given in same way as denest ones, they must\
  find something."
   `(if ,cond (return-from denest ,returned) (progn ,@body)))
 
-(def-denest-macro :find (cond returned &body)
+(def-denest-macro :unless-return (cond returned &body body)
+  "Return when condition false. Can be used to return something when you\
+ find something."
+  `(if (not ,cond) (return-from denest ,returned) (progn ,@body)))
+
+(def-denest-macro :find (cond returned &body body)
   "Renaming of when-return so that people will find that you can use it\
  to find stuff."
   `(use-denest-macro :when-return ,cond ,returned ,@body))
 
 ;;Finishing.
 (def-denest-macro :until ((cond &optional (to 'denest-prev-ret)) &body body)
-  `(if ,cond (return-from denest-prev-ret) (progn ,@body)))
+  `(if ,cond (return-from ,to) (progn ,@body)))
 
 (def-denest-macro :while ((cond &optional (to 'denest-prev-ret)) &body body)
-  `(if (not ,cond) (return-from denest-prev-ret) (progn ,@body)))
+  `(if (not ,cond) (return-from ,to) (progn ,@body)))
 
 ;;Some iterators.
 (def-denest-macro :integer-interval ((i from to &optional (by 1))
@@ -261,12 +273,12 @@ Must given accumulation-manners given in same way as denest ones, they must\
        (use-denest-macro :integer-block (,@(cdr block)) ,@body))))
 
 (def-denest-macro :on-vector
-    ((el vector &key (vector-gs (gensym)) (from 0) (to `(length ,vect-gs))
+    ((el vector &key (vect-gs (gensym)) (from 0) (to `(length ,vect-gs))
 	 (i (gensym))) &body body)
   "Iterates on vector. TODO make like :on-list"
-  `(let ((,vector-gs ,vector))
+  `(let ((,vect-gs ,vector))
      (use-denest-macro :integer-interval (,i ,from ,to)
-       (symbol-macrolet ((,el (aref ,vector-gs ,i)))
+       (symbol-macrolet ((,el (aref ,vect-gs ,i)))
 	 ,@body))))
 
 (def-denest-macro :on-list ((&rest els) &body body)
@@ -301,3 +313,17 @@ Symbols are symbol-macrolets such that they're setf-able."
 (def-denest-macro :* ((name &rest args) &body body)
   "Little macro to be able to give arguments the regular way in DENEST*"
   `(,@(when (keywordp name) '(use-denest-macro)) ,name ,@args ,@body))
+
+;;Very basic stuff, just to make writing it shorter.
+
+(def-denest-macro :slots ((&rest slots) obj &body body)
+  "With-slots denest variant, just to save a few characters."
+  `(with-slots (,@slots) ,obj ,@body))
+
+(def-denest-macro :mval ((&rest values) input &body body)
+  "Multiple-value-bind variant, just to save a few characters."
+  `(multiple-value-bind (,@values) ,input ,@body))
+
+(def-denest-macro :lval ((&rest args) list &body body)
+  "destructuring-bind variant, just to save a few characters."
+  `(multiple-value-bind (,@args) ,list ,@body))

@@ -1,7 +1,7 @@
-Here under is the license. All files distributed along with this are under 
-this license unless explicitly stated otherwise.
+Below is the license. All files distributed along with this are under 
+this license unless explicitly stated otherwise on the file itself.
 
-Copyright (c) 2007-2009, Jasper den Ouden <o.jasper@gmail.com>
+Copyright (c) 2009, Jasper den Ouden <o.jasper@gmail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

@@ -7,21 +7,31 @@
 
 <table>
     <td width="20%"></td>
-    <td width="20%"><big><h1>Some small lisp things</h1></big></td>
+    <td width="20%"><big><h1>Denest, and some small lisp things</h1></big></td>
 </table>
 </tr><tr height=90%><table><td width=20% valign="top">
 
 <big>
   <h3>Contents</h3>
   <ul>
-    <li><a href="main.html">Main page</a></li>
-    <li><a href="umac.html">umac</a><br />
-        <a href="umac-autodoc.html">autodoc</a> </li>
-    <li><a href="scope.html">scope</a><br />
-        <a href="scope-autodoc.html">autodoc</a> </li>
-    <li><a href="unlisp.html">unlisp</a><br />
-        <a href="unlisp-autodoc.html">autodoc</a> </li>
-    <li><a href="generic.html">generic</a></li>
+    <li>
+      <a href="main.html">Main page/<b>Denest</b></a> <br />
+      <a href="autodoc/denest.html">newer autodoc for Denest</a>
+    </li>
+    <li>
+      <a href="umac.html">umac</a><br />
+      <a href="autodoc/umac.html">autodoc</a>, <a href="umac-autodoc.html">older</a> </li>
+    <li>
+      <a href="scope.html">scope</a><br />
+      <a href="scope-autodoc.html">autodoc</a> </li>
+    <li>
+      <a href="unlisp.html">unlisp</a><br />
+      <a href="autodoc/unlisp.html">autodoc</a>,
+      <a href="unlisp-autodoc.html">older</a> </li>
+    <li>
+      <a href="generic.html">generic</a><br />
+      <a href="autodoc/generic.html">newerautodoc</a>
+    </li>
     <li><b>Download</b>
       <ul><li><a href="https://developer.berlios.de/git/?group_id=10729" >Git repository</a></li>
         <li><a href="http://download.berlios.de/gitdumps/lisp-umac-git.tar.gz" >Daily tarball</a></li>
@@ -31,7 +41,7 @@
     <li><a href="about.html">About/Contact</a></li>
   </ul>
 </big>
-<small>Last update March 26 2009</small>
+<small>Last update Oct 3 2009</small>
 
 <hr />
 <table>
@@ -43,8 +53,45 @@
 </table>
 </td><td width=80%>
 
-This page was originally for the <a href="umac.html">umac</a> macro. Now i have
- also added some other (reader)macros, like <a href="scope.html">scope</a> and <a href="unlisp.html">unlisp</a>.
+This page was originally for the <a href="umac.html">umac</a> macro, but
+ now i have a superior macro, <a href="main.html#denest">denest</a>. 
+There are also added some other (reader)macros, like <a href="scope.html">
+scope</a> and <a href="unlisp.html">unlisp</a>.
+
+<a name="denest"><h2>Denest</h2></a>
+
+<p>Denest is a macro to de-nest code. Although the real thing also has some
+ stuff to help with accumulating and to make good use of keywords, its basic
+form is:</p>
+
+<code>(defmacro denest (&rest args)
+  (if (null (cdr args))
+    (car args)
+    `(,@(car args)
+        (denest ,@(cdr args)))))</code>
+
+<p>That simple, and if used properly, it is easy to execute back and forth
+in your mind. Given the right macros to input, it also seems to address
+ the problem that other macros, like iterate, loop, bind try to solve in a
+ more complicated fashion.</p>
+
+<p><a href="http://common-lisp.net/project/metabang-bind/documentation/metabang.bind-package/index.html">
+    Metabang-bind</a>, and <a href="http://github.com/ks/X.LET-STAR">let-star</a> 
+  could somewhat do this too, but the makers didn't realize that this is (imo) what
+  it comes down to; you are limited in what form it is entered, have to explicitly
+ask for it. (And let-star doesn't expose its <a href="http://github.com/ks/X.LET-STAR/blob/master/let-star.lisp#L37">
+<code>define-binder</code></a>, i forgot whether metabang-bind did.
+</p>
+
+<p>I also mentioned it <a href="http://lispforum.com/viewtopic.php?f=2&t=295&sid=bd1bc74cbdd9eeea5d904d1a0cbb0d4b&start=30#p3068">
+in this forum</a>.</p>
+
+<a name="Useage"><h3>Usage</h3></a>
+
+You can load it using either simply <code>(load "denest.lisp")</code>
+(Well the path to there too), or <code>(asdf:oos 'asdf:load-op :denest)</code>
+ There are examples in use-rest/play-denest.lisp, and
+ <a href="autodoc/denest.html">there is documentation</a>.
 
 <hr />
 <table><tr><td width="80%"></td>

@@ -46,6 +46,3 @@
 (maximizing ()
   (dolist (a '(1 2 3 4 5 6 7 214  577  74 1 1 23 5 32 64 73))
     (maximizing a)))
-
-
-

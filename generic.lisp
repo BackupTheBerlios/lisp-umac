@@ -1,20 +1,25 @@
 ;;Author: Jasper den Ouden
 ;;This file is in public domain.
 
-(cl:in-package)
+(cl:in-package :cl-user)
 
 (defpackage #:generic
   (:nicknames #:gen)
-  (:use #:common-lisp #:iterate)
-  (:export sqr
-	   delist
+  (:use #:common-lisp)
+  (:export sqr delist
+
+	   curry curry-l
+	   
            with-gensyms for-more setf-
 	   if-let if-use when-let case-let
-	   cond* ift when-do
+	   ift when-do
 	   string-case
 	   clamp
 
-	   with-mod-slots)
+	   with-mod-slots
+	   with-access with-mod-access
+
+	   setf-defun)
   (:documentation "Assortment of little useful macros/functions."))
 
 (in-package #:generic)
@@ -29,8 +34,7 @@
 
 (defmacro with-gensyms ((&rest vars)&body body)
 "Makes you some variables with gensyms output in them."
-  `(let (,@(iter (for el in vars)
-		 (collect `(,el (gensym)))))
+  `(let (,@(mapcar (lambda (v) `(,v (gensym))) vars))
      ,@body))
 
 (defmacro for-more (macroname &rest args)
@@ -66,43 +70,6 @@
   "Case, but makes a variable for you."
   `(let ((,var ,is))
      (case ,var ,@cases)))
-
-(defmacro cond* (&rest clauses)
-  "Cond where keywords at start of clauses mean things.
-:let makes a single conditition a variable for you, available in body.
-:with(*) makes a bunch of variables which is then available for the clause\
- condition and body.
-:or-let(*) and :and-let make you a series of variables that all have to be\
- true/false."
-  (flet ((make-multi-let-type (c i let comb)
-	   `(t (,let (,@(cadr c))
-		 (if (,comb ,@(iter (for el in (cadr c))
-				    (collect (car el))))
-		   (progn ,@(cddr c))
-		   (cond* ,@(cdr i))))))
-	 (make-with (c i let)
-	   `(t (,let (,@(cadr c))
-		 (if ,(caddr c)
-		   (progn ,@(cdddr c))
-		   (cond* ,@(cdr i)))))))
-  `(cond
-     ,@(iter (for i on clauses)
-	     (for c in clauses)
-	     (case (car c)
-	       (:with    (collect (make-with c i 'let))
-			 (finish))
-	       (:with*   (collect (make-with c i 'let*))
-			 (finish))
-	       (:let
-		(collect `(t (if-let ,(cadr c) ,(caddr c)
-				(progn ,@(cdddr c))
-				(cond* ,@(cdr i)))))
-		(finish))			     
-	       (:or-let  (collect (make-multi-let-type c i 'let 'or)))
-	       (:or-let* (collect (make-multi-let-type c i 'let* 'or)))
-	       (:and-let (collect (make-multi-let-type c i 'let 'and)))
-	       (:and-let*(collect (make-multi-let-type c i 'let* 'and)))
-	       (t        (collect c)))))))
 
 (defmacro ift (manner self &rest with)
   "Returns itself if `(,manner ,self ,@with) true."
@@ -147,8 +114,50 @@
   (with-gensyms (obj)
     `(let ((,obj ,object))
        (symbol-macrolet
-	   (,@(iter
-	       (for slot in slots)
-	       (collect `(,(intern (format nil "~D~D" mod slot))
-			   (slot-value ,obj ',slot)))))
+	   (,@(mapcar (lambda (slot)
+			`(,(intern (format nil "~D~D" mod slot))
+			   (slot-value ,obj ',slot)))
+		      slots))
 	 ,@body))))
+
+(defmacro with-mod-access (mod (&rest accessors) object &body body)
+  "Access objects. Lists on accessors/readers or plain functions are seen
+ as (function &rest args-after) 
+Mod adds some name previously so you can work with multiple of the same.\
+ (Similar to with-mod-slots.)"
+  (with-gensyms (obj)
+    `(let ((,obj ,object))
+       (symbol-macrolet
+	   (,@(mapcar 
+	       (lambda (a)
+		 `(,(if mod (intern (format nil "~D~D" mod (delist a)))
+			    (delist a))
+		    (,(delist a) ,obj ,@(when (listp a) (cdr a)))))
+	       accessors))
+	 ,@body))))
+
+(defmacro with-access ((&rest accessors) object &body body)
+  "Access objects. Lists on accessors/readers/ plain functions  are seen as
+ (function &rest args-after)."
+  `(with-access nil (,@accessors) ,object ,@body))
+
+(defun curry (fun &rest curried)
+  "Curry to the right; add arguments to the end of the function.
+Note: uses apply.. Hope it will optimize."
+  (lambda (&rest args)
+    (apply fun (append args curried))))
+
+(defun curry-l (fun &rest curried)
+  "Curry to the left; add arguments to the start of the function.
+Note: uses apply.. Hope it will optimize."
+  (lambda (&rest args)
+    (apply fun (append curried args))))
+
+(defmacro setf-defun (name (&rest args) &body body)
+  "Make a defun and a setter at the same time.
+TODO see though things."
+  (with-gensyms (to)
+    `(progn (defun ,name (,@args) ,@body)
+	    (defun (setf ,name) (,to ,@args)
+	      ,(car body)
+	      (setf ,@(last body) ,to)))))
