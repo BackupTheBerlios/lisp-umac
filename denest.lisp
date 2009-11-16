@@ -20,7 +20,7 @@
 ;; THE SOFTWARE.
 ;;
 
-(cl:in-package :cl)
+(cl:in-package :cl-user)
 
 (defpackage :denest
   (:use :common-lisp)
