@@ -19,7 +19,9 @@
 	   with-mod-slots
 	   with-access with-mod-access
 
-	   setf-defun)
+	   setf-defun
+	   
+	   var-changer def-changable-var)
   (:documentation "Assortment of little useful macros/functions."))
 
 (in-package #:generic)
@@ -139,7 +141,7 @@ Mod adds some name previously so you can work with multiple of the same.\
 (defmacro with-access ((&rest accessors) object &body body)
   "Access objects. Lists on accessors/readers/ plain functions  are seen as
  (function &rest args-after)."
-  `(with-access nil (,@accessors) ,object ,@body))
+  `(with-mod-access nil (,@accessors) ,object ,@body))
 
 (defun curry (fun &rest curried)
   "Curry to the right; add arguments to the end of the function.
@@ -161,3 +163,17 @@ TODO see though things."
 	    (defun (setf ,name) (,to ,@args)
 	      ,(car body)
 	      (setf ,@(last body) ,to)))))
+
+(defmacro var-changer (var-name
+	           &key (doc "Changes a variable, see the variable doc."))
+  "Makes a variable changer for a given variable."
+  `(defmacro ,var-name (,var-name &body body)
+     ,doc
+     (append (list 'let (list (list ,var-name ,var-name)))
+	     body)))
+
+(defmacro def-changable-var (var-name &key init doc (changer-doc doc)
+			 (name var-name))
+  "Makes variable, then makes it changable"
+  `(progn (defvar ,var-name ,init ,doc)
+	  (var-changer ,var-name :doc ,changer-doc)))
